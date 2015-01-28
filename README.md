@@ -18,6 +18,12 @@ and install it with
 
 Please fork, modify, and send a pull request if you want to help improve this gem.
 
+## Thanks
+
+This gem is based off of the 'pushmeup' gem by Nicos Karalis
+
+https://github.com/NicosKaralis/pushmeup
+
 ## License
 
 Mercurius is released under the MIT license:

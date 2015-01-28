@@ -5,7 +5,7 @@ require "mercurius/version"
 Gem::Specification.new do |s|
   s.name            = 'mercurius'
   s.version         = Mercurius::VERSION
-  s.authors         = ["Nicos Karalis", "John Beck"]
+  s.authors         = ["John Beck"]
   s.email           = ["jbeck@live.com"]
 
   s.homepage        = "https://github.com/jrbeck/mercurius"
