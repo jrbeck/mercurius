@@ -6,23 +6,6 @@ describe Mercurius do
       defined?(APNS).should_not be_false
     end
 
-    it "should not forget the APNS default parameters" do
-      APNS.host.should == "gateway.sandbox.push.apple.com"
-      APNS.port.should == 2195
-      APNS.pem_path.should be_equal(nil)
-      APNS.pem_password.should be_equal(nil)
-    end
-
-    describe "Notifications" do
-      describe "#==" do
-        it "should properly equate objects without caring about object identity" do
-          a = APNS::Notification.new("123", {:alert => "hi"})
-          b = APNS::Notification.new("123", {:alert => "hi"})
-          a.should eq(b)
-        end
-      end
-    end
-
     describe '.send_notification' do
       let(:token) { 'token' }
       let(:message) { 'message' }
