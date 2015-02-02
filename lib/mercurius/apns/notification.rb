@@ -1,46 +1,46 @@
 module APNS
   class Notification
-    attr_accessor :device_token, :alert, :badge, :sound, :other
+    include ActiveModel::Model
 
-    def initialize(device_token, message)
-      self.device_token = device_token
-      if message.is_a?(Hash)
-        self.alert = message[:alert]
-        self.badge = message[:badge]
-        self.sound = message[:sound]
-        self.other = message[:other]
-      elsif message.is_a?(String)
-        self.alert = message
-      else
-        raise "Notification needs to have either a Hash or String"
-      end
+    MAX_PAYLOAD_BYTES = 2048
+
+    attr_accessor :device_token, :alert, :badge, :sound, :other
+    attr_reader :attributes
+
+    def initialize(attributes = {})
+      @attributes = attributes
+      super
+    end
+
+    def payload
+      {
+        alert: alert,
+        badge: badge,
+        sound: sound,
+        other: other
+      }.compact
     end
 
     def packaged_notification
-      pt = self.packaged_token
-      pm = self.packaged_message
-      [0, 0, 32, pt, 0, pm.bytesize, pm].pack("ccca*cca*")
+      [0, 0, 32, packaged_device_token, 0, packaged_message.bytesize, packaged_message].pack("ccca*cca*")
     end
 
-    def packaged_token
+    def packaged_device_token
       [device_token.gsub(/[\s|<|>]/,'')].pack('H*')
     end
 
     def packaged_message
-      aps = {'aps'=> {} }
-      aps['aps']['alert'] = self.alert if self.alert
-      aps['aps']['badge'] = self.badge if self.badge
-      aps['aps']['sound'] = self.sound if self.sound
-      aps.merge!(self.other) if self.other
-      aps.to_json.gsub(/\\u([\da-fA-F]{4})/) {|m| [$1].pack("H*").unpack("n*").pack("U*")}
+      { aps: payload }.to_json.gsub(/\\u([\da-fA-F]{4})/) do |m|
+        [$1].pack("H*").unpack("n*").pack("U*")
+      end
     end
 
     def ==(that)
-      device_token == that.device_token &&
-      alert == that.alert &&
-      badge == that.badge &&
-      sound == that.sound &&
-      other == that.other
+      attributes == that.attributes
+    end
+
+    def valid?
+      packaged_message.bytesize <= MAX_PAYLOAD_BYTES
     end
 
   end
