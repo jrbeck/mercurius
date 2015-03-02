@@ -4,7 +4,7 @@ module APNS
 
     MAX_PAYLOAD_BYTES = 2048
 
-    attr_accessor :device_token, :alert, :badge, :sound, :other
+    attr_accessor :alert, :badge, :sound, :other
     attr_reader :attributes
 
     def initialize(attributes = {})
@@ -21,11 +21,11 @@ module APNS
       }.compact
     end
 
-    def packaged_notification
-      [0, 0, 32, packaged_device_token, 0, packaged_message.bytesize, packaged_message].pack("ccca*cca*")
+    def pack(device_token)
+      [0, 0, 32, package_device_token(device_token), 0, packaged_message.bytesize, packaged_message].pack("ccca*cca*")
     end
 
-    def packaged_device_token
+    def package_device_token(device_token)
       [device_token.gsub(/[\s|<|>]/,'')].pack('H*')
     end
 

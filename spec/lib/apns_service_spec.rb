@@ -25,48 +25,43 @@ describe APNS::Service do
     end
 
     it 'sends a single message' do
-      message = APNS::Notification.new(device_token: 'token123', alert: 'Hey')
-      service.send message
+      message = APNS::Notification.new(alert: 'Hey')
+      service.deliver message, 'token123'
       expect(ssl.wrote[0]).to include ({ alert: 'Hey' }).to_json
     end
 
-    it 'sends multiple messages via splat' do
-      message1 = APNS::Notification.new(device_token: 'token123', alert: 'Hey1')
-      message2 = APNS::Notification.new(device_token: 'token123', alert: 'Hey2')
-      service.send message1, message2
-      expect(ssl.wrote[0]).to include 'Hey1'
-      expect(ssl.wrote[1]).to include 'Hey2'
+    it 'sends to multiple tokens via splat' do
+      message = APNS::Notification.new(alert: 'Hey')
+      service.deliver message, 'token123', 'token456'
+      expect(ssl.wrote.size).to eq 2
     end
 
-    it 'sends multiple messages via array' do
-      message1 = APNS::Notification.new(device_token: 'token123', alert: 'Hey1')
-      message2 = APNS::Notification.new(device_token: 'token123', alert: 'Hey2')
-      service.send [message1, message2]
-      expect(ssl.wrote[0]).to include 'Hey1'
-      expect(ssl.wrote[1]).to include 'Hey2'
+    it 'sends to multiple token via array' do
+      message = APNS::Notification.new(alert: 'Hey1')
+      service.deliver message, ['token123', 'token456']
+      expect(ssl.wrote.size).to eq 2
     end
 
     describe 'persist' do
       it 'with persist, it keeps the SSL connection open until all messages are sent' do
-
         expect(service.connection).to receive(:close).once
         service.persist do
-          service.send APNS::Notification.new(device_token: 'token123', alert: 'Hey1')
-          service.send APNS::Notification.new(device_token: 'token123', alert: 'Hey2')
+          service.deliver APNS::Notification.new(alert: 'Hey1'), 'token123'
+          service.deliver APNS::Notification.new(alert: 'Hey2'), 'token123'
         end
       end
 
       it 'without persist, closes the connection on each message' do
         expect(service.connection).to receive(:close).twice
-        service.send APNS::Notification.new(device_token: 'token123', alert: 'Hey1')
-        service.send APNS::Notification.new(device_token: 'token123', alert: 'Hey2')
+        service.deliver APNS::Notification.new(alert: 'Hey1'), 'token123'
+        service.deliver APNS::Notification.new(alert: 'Hey2'), 'token123'
       end
     end
 
     describe 'retries' do
       it 'tries 3 times before giving up' do
         allow(service.connection).to receive(:open) { raise StandardError }
-        expect { service.send APNS::Notification.new(device_token: 'token123', alert: 'Hey1') }.to raise_exception(TooManyRetriesError)
+        expect { service.deliver APNS::Notification.new(alert: 'Hey1'), 'token123' }.to raise_exception(TooManyRetriesError)
         expect(service.attempts).to eq 3
       end
     end
