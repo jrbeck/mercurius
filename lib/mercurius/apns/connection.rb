@@ -1,23 +1,26 @@
 module APNS
   class Connection
-    attr_reader :host, :port, :ssl
+    attr_reader :host, :port, :pem
 
     def initialize(host, port, pem)
-      @socket = TCPSocket.new host, port
-      @ssl = OpenSSL::SSL::SSLSocket.new @socket, ssl_context_for_pem(pem)
+      @host = host
+      @port = port
+      @pem = pem
     end
 
     def open
+      @socket ||= TCPSocket.new host, port
+      @ssl ||= OpenSSL::SSL::SSLSocket.new @socket, ssl_context_for_pem(pem)
       @ssl.connect
     end
 
     def close
-      @ssl.close
-      @socket.close
+      @ssl.close if @ssl
+      @socket.close if @socket
     end
 
     def closed?
-      @ssl.closed? && @socket.closed?
+      (@ssl.nil? || @ssl.closed?) ||  (@socket.nil? || @socket.closed?)
     end
 
     def write(data)
