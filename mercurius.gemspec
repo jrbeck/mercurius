@@ -22,7 +22,6 @@ Gem::Specification.new do |s|
 
   s.require_paths = ["lib"]
 
-  s.add_dependency 'httparty'
   s.add_dependency 'json'
   s.add_dependency 'faraday'
   s.add_dependency 'faraday_middleware'
