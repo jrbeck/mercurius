@@ -23,11 +23,11 @@ module APNS
       connection.close
     end
 
-    def send(*notifications)
-      notifications = Array(notifications).flatten
+    def deliver(notification, *device_tokens)
+      device_tokens = Array(device_tokens).flatten
       with_connection do |connection|
-        notifications.each do |message|
-          connection.ssl.write message.packaged_notification
+        device_tokens.each do |device_token|
+          connection.write notification.pack(device_token)
         end
       end
     end

@@ -20,6 +20,10 @@ module APNS
       @ssl.closed? && @socket.closed?
     end
 
+    def write(data)
+      @ssl.write data
+    end
+
     private
 
       def ssl_context_for_pem(pem)
