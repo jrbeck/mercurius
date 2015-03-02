@@ -1,4 +1,6 @@
 require File.expand_path('../../../lib/mercurius/testing/service', __FILE__)
+require File.expand_path('../../../lib/mercurius/testing/base', __FILE__)
+require File.expand_path('../../../lib/mercurius/testing/delivery', __FILE__)
 
 describe 'Test mode' do
 
@@ -10,13 +12,17 @@ describe 'Test mode' do
     include Mercurius::Testing::Service
   end
 
+  after do
+    Mercurius::Testing::Base.reset
+  end
+
   context 'GCM' do
     let(:service) { GCM::MockService.new }
     let(:message) { GCM::Notification.new(alert: 'Hey') }
 
     it 'returns the deliveries sent to GCM' do
       service.deliver message, 'token123'
-      delivery = service.deliveries[0]
+      delivery = Mercurius::Testing::Base.deliveries[0]
       expect(delivery.device_tokens).to include 'token123'
       expect(delivery.notification.data).to eq Hash[alert: 'Hey']
     end
@@ -28,7 +34,7 @@ describe 'Test mode' do
 
     it 'returns the deliveries sent to APNS' do
       service.deliver message, 'token123'
-      delivery = service.deliveries[0]
+      delivery = Mercurius::Testing::Base.deliveries[0]
       expect(delivery.device_tokens).to include 'token123'
       expect(delivery.notification.alert).to eq 'Hey'
     end
