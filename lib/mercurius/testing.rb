@@ -1,4 +1,4 @@
-require 'testing/service'
+require 'mercurius/testing/service'
 
-APNS::Service.send :prepend, TestService
-GCM::Service.send :prepend, TestService
+APNS::Service.send :prepend, Mercurius::Testing::Service
+GCM::Service.send :prepend, Mercurius::Testing::Service
