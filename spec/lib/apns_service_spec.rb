@@ -57,14 +57,14 @@ describe APNS::Service do
         service.deliver APNS::Notification.new(alert: 'Hey2'), 'token123'
       end
     end
-
-    describe 'retries' do
-      it 'tries 3 times before giving up' do
-        allow(service.connection).to receive(:open) { raise StandardError }
-        expect { service.deliver APNS::Notification.new(alert: 'Hey1'), 'token123' }.to raise_exception(TooManyRetriesError)
-        expect(service.attempts).to eq 3
-      end
-    end
-
   end
+
+  describe 'retries' do
+    it 'tries 3 times before giving up' do
+      allow(service.connection).to receive(:open) { raise StandardError }
+      expect { service.deliver APNS::Notification.new(alert: 'Hey1'), 'token123' }.to raise_exception(TooManyRetriesError)
+      expect(service.attempts).to eq 3
+    end
+  end
+
 end

@@ -45,7 +45,7 @@ module APNS
           connection.open if connection.closed?
           yield connection
         rescue StandardError, Errno::EPIPE => e
-          raise TooManyRetriesError.new if too_many_retries?
+          raise TooManyRetriesError.new(e) if too_many_retries?
           connection.close
           @attempts += 1
           retry
