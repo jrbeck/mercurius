@@ -1,6 +1,6 @@
-require File.expand_path('../../../lib/mercurius/testing/service', __FILE__)
-require File.expand_path('../../../lib/mercurius/testing/base', __FILE__)
-require File.expand_path('../../../lib/mercurius/testing/delivery', __FILE__)
+%w(service base result delivery).each do |rb|
+  require File.expand_path("../../../lib/mercurius/testing/#{rb}", __FILE__)
+end
 
 describe 'Test mode' do
 
@@ -21,10 +21,11 @@ describe 'Test mode' do
     let(:message) { GCM::Notification.new(alert: 'Hey') }
 
     it 'returns the deliveries sent to GCM' do
-      service.deliver message, 'token123'
+      result = service.deliver message, 'token123'
       delivery = Mercurius::Testing::Base.deliveries[0]
       expect(delivery.device_tokens).to include 'token123'
       expect(delivery.notification.data).to eq Hash[alert: 'Hey']
+      expect(result).to be_a_kind_of Mercurius::Testing::Result
     end
   end
 
@@ -33,10 +34,11 @@ describe 'Test mode' do
     let(:message) { APNS::Notification.new(alert: 'Hey') }
 
     it 'returns the deliveries sent to APNS' do
-      service.deliver message, 'token123'
+      result = service.deliver message, 'token123'
       delivery = Mercurius::Testing::Base.deliveries[0]
       expect(delivery.device_tokens).to include 'token123'
       expect(delivery.notification.alert).to eq 'Hey'
+      expect(result).to be_a_kind_of Mercurius::Testing::Result
     end
   end
 
