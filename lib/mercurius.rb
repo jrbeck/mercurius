@@ -7,6 +7,7 @@ require 'json'
 
 require 'mercurius/version'
 
+require 'mercurius/errors/invalid_apns_mode_error'
 require 'mercurius/errors/pem_not_configured_error'
 require 'mercurius/errors/pem_not_found_error'
 require 'mercurius/errors/too_many_retries_error'

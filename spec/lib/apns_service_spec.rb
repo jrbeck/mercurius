@@ -10,9 +10,9 @@ describe APNS::Service do
   end
 
   it 'should default to the APNS module configs' do
-    expect(service.host).to eq 'gateway.sandbox.push.apple.com'
-    expect(service.port).to eq 2195
-    expect(service.pem.password).to eq 'test123'
+    expect(service.host).to eq APNS.host
+    expect(service.port).to eq APNS.port
+    expect(service.pem.password).to eq APNS.pem.password
   end
 
   describe '#send' do
