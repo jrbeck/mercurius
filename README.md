@@ -18,20 +18,24 @@ and install it with
 
 ## GCM
 
-GCM is very simple to use. Create the service with:
+Set up the default GCM configuration. (All GCM::Services will be created with this configuration, but the configuration can be overridden per-service if you need to.)
+
+    GCM.key = 'your_gcm_key'
+
+Create the service with:
 
     gcm_service = GCM::Service.new
 
 Now create the notification that you wish to send:
 
-    GCM::Notification.new(alert: 'Hey')
+    gcm_notification = GCM::Notification.new(alert: 'Hey')
 
-You can deliver the notification in the following manners:
+You can deliver the gcm_notification in the following manners:
 
-    gcm_service.deliver message, 'token123'              # single recipient
-    gcm_service.deliver message, 'token123', 'token456'  # multiple recipients
+    gcm_service.deliver gcm_notification, 'token123'              # single recipient
+    gcm_service.deliver gcm_notification, 'token123', 'token456'  # multiple recipients
     token_array = ['token123', 'token456']
-    gcm_service.deliver message, token_array             # multiple recipients
+    gcm_service.deliver gcm_notification, token_array             # multiple recipients
 
 ## APNS
 
@@ -44,6 +48,7 @@ or
     APNS.set_mode(:production) # gateway.push.apple.com
 
 Next, you'll need to set your PEM information. This can either be with a file or with a text buffer:
+
     pem = APNS::Pem.new(path: 'sandbox.pem', password: 'test123')
     pem = APNS::Pem.new(data: pem_data_buffer, password: 'test123')
 
@@ -57,14 +62,14 @@ Now you are ready to create the APNS::Service, which will allow you to send noti
 
 The APNS::Service object is created with the settings from earlier, but any of them can be overridden if you need more control (for instance if you need to send with multiple PEMs)
 
-    message = APNS::Notification.new(alert: 'Hey')
+    apns_notification = APNS::Notification.new(alert: 'Hey')
 
 The deliver method can be called in the following ways:
 
-    apns_service.deliver message, 'token123'              # single recipient
-    apns_service.deliver message, 'token123', 'token456'  # multiple recipients
+    apns_service.deliver apns_notification, 'token123'              # single recipient
+    apns_service.deliver apns_notification, 'token123', 'token456'  # multiple recipients
     token_array = ['token123', 'token456']
-    apns_service.deliver message, token_array             # multiple recipients
+    apns_service.deliver apns_notification, token_array             # multiple recipients
 
 ## Contributing
 

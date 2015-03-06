@@ -3,8 +3,8 @@ describe GCM::Service do
   let(:message) { GCM::Notification.new(alert: 'Hey') }
 
   it 'should default to the GCM module configs' do
-    expect(service.host).to eq 'https://android.googleapis.com/'
-    expect(service.key).to be_nil
+    expect(service.host).to eq GCM.host
+    expect(service.key).to GCM.key
   end
 
   describe '#send' do
