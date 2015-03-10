@@ -27,6 +27,10 @@ module APNS
       @ssl.write data
     end
 
+    # def read()
+    #   @ssl.read
+    # end
+
     private
 
       def ssl_context_for_pem(pem)

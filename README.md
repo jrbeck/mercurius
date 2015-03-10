@@ -41,11 +41,11 @@ You can deliver the gcm_notification in the following manners:
 
 The typical APNS configuration is set automatically, but you need to set the host with with either:
 
-    APNS.set_mode(:develop) # gateway.sandbox.push.apple.com
+    APNS.mode = :development  # gateway.sandbox.push.apple.com
 
 or
 
-    APNS.set_mode(:production) # gateway.push.apple.com
+    APNS.mode = :production   # gateway.push.apple.com
 
 Next, you'll need to set your PEM information. This can either be with a file or with a text buffer:
 

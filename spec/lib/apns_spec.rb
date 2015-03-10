@@ -1,12 +1,12 @@
 describe APNS do
 
-  it 'sets up the develop mode' do
-    APNS.set_mode(:develop)
-    expect(APNS.host).to eq APNS::HOSTS[:develop]
+  it 'sets up the development mode' do
+    APNS.mode = :development
+    expect(APNS.host).to eq APNS::HOSTS[:development]
   end
 
   it 'sets up the production mode' do
-    APNS.set_mode(:production)
+    APNS.mode = :production
     expect(APNS.host).to eq APNS::HOSTS[:production]
   end
 

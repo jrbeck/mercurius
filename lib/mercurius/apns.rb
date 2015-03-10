@@ -1,6 +1,6 @@
 module APNS
   HOSTS = {
-    develop: 'gateway.sandbox.push.apple.com',
+    development: 'gateway.sandbox.push.apple.com',
     production: 'gateway.push.apple.com',
   }
 
@@ -11,8 +11,8 @@ module APNS
   class << self
     attr_accessor :host, :port, :pem
 
-    def set_mode(mode)
-      host = HOSTS.fetch(mode, nil)
+    def mode=(mode)
+      host = HOSTS.fetch(mode.to_sym, nil)
       raise InvalidApnsModeError.new if host.nil?
       @host = host
     end

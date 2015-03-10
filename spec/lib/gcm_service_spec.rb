@@ -4,7 +4,7 @@ describe GCM::Service do
 
   it 'should default to the GCM module configs' do
     expect(service.host).to eq GCM.host
-    expect(service.key).to GCM.key
+    expect(service.key).to eq GCM.key
   end
 
   describe '#send' do
