@@ -1,3 +1,5 @@
+require 'socket'
+
 module APNS
   class Connection
     attr_reader :host, :port, :pem
@@ -27,9 +29,9 @@ module APNS
       @ssl.write data
     end
 
-    # def read()
-    #   @ssl.read
-    # end
+    def read
+      @ssl.read
+    end
 
     private
 

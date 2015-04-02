@@ -12,9 +12,8 @@ module APNS
     attr_accessor :host, :port, :pem
 
     def mode=(mode)
-      host = HOSTS.fetch(mode.to_sym, nil)
-      raise InvalidApnsModeError.new if host.nil?
-      @host = host
+      raise InvalidApnsModeError.new unless HOSTS.include? mode.to_sym
+      @host = HOSTS[mode.to_sym]
     end
 
   end
