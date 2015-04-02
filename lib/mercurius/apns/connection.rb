@@ -11,8 +11,8 @@ module APNS
     end
 
     def open
-      @socket ||= TCPSocket.new host, port
-      @ssl ||= OpenSSL::SSL::SSLSocket.new @socket, ssl_context_for_pem(pem)
+      @socket = TCPSocket.new host, port
+      @ssl = OpenSSL::SSL::SSLSocket.new @socket, ssl_context_for_pem(pem)
       @ssl.connect
     end
 
@@ -22,7 +22,7 @@ module APNS
     end
 
     def closed?
-      (@ssl.nil? || @ssl.closed?) ||  (@socket.nil? || @socket.closed?)
+      (@ssl.nil? || @ssl.closed?) && (@socket.nil? || @socket.closed?)
     end
 
     def write(data)
