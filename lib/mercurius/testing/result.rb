@@ -23,6 +23,10 @@ module Mercurius
         []
       end
 
+      def has_canonical_ids?
+        false
+      end
+
     end
   end
 end

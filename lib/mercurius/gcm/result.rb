@@ -23,5 +23,8 @@ module GCM
       @_failed_device_tokens ||= failed_responses.flat_map { |response| response.device_tokens }
     end
 
+    def has_canonical_ids?
+      responses.map{ |response| response.has_canonical_ids? }.reduce{ |carry, val| carry || val }
+    end
   end
 end
