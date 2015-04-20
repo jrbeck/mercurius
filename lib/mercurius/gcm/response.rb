@@ -31,5 +31,19 @@ module GCM
     def failed?
       !success?
     end
+
+    def has_canonical_ids?
+      (response_body.canonical_ids || 0) > 0
+    end
+
+    def canonical_ids
+      response_body.results.map do |result|
+        result["registration_id"]
+      end
+    end
+
+    def response_body
+      @response_body ||= OpenStruct.new JSON.parse(response.body)
+    end
   end
 end
