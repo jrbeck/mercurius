@@ -4,7 +4,7 @@ module APNS
 
     MAX_PAYLOAD_BYTES = 2048
 
-    attr_accessor :alert, :badge, :sound, :other
+    attr_accessor :alert, :badge, :sound, :other, :content_available
     attr_reader :attributes
 
     def initialize(attributes = {})
@@ -14,10 +14,11 @@ module APNS
 
     def payload
       {
-        alert: alert,
-        badge: badge,
-        sound: sound,
-        other: other
+        'alert' => alert,
+        'badge' => badge,
+        'sound' => sound,
+        'other' => other,
+        'content-available' => content_available,
       }.compact
     end
 
