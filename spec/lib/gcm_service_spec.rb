@@ -7,7 +7,7 @@ describe GCM::Service do
     expect(service.key).to eq GCM.key
   end
 
-  describe '#send' do
+  describe '#deliver' do
     before { stub_request :post, %r[android.googleapis.com/gcm/send] }
 
     it 'sends a single message' do
@@ -35,6 +35,17 @@ describe GCM::Service do
         with(body: { data: { alert: 'Hey' }, registration_ids: tokens.take(999) })
       expect(WebMock).to have_requested(:post, %r[android.googleapis.com/gcm/send]).
         with(body: { data: { alert: 'Hey' }, registration_ids: [tokens.last] })
+    end
+  end
+
+  describe '#deliver_topic' do
+    before { stub_request :post, %r[android.googleapis.com/gcm/send] }
+    let(:message) { { notification: { title: 'hello', body: 'world' } } }
+
+    it 'sends a notification to a topic' do
+      service.deliver_topic message, '/topics/global'
+      expect(WebMock).to have_requested(:post, %r[android.googleapis.com/gcm/send]).
+        with(body: message.merge(to: '/topics/global'))
     end
   end
 

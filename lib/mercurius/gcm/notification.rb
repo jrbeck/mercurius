@@ -3,7 +3,7 @@ module GCM
     include ActiveModel::Model
 
     def self.special_attrs
-      [:collapse_key, :time_to_live, :delay_while_idle, :dry_run]
+      [:collapse_key, :time_to_live, :delay_while_idle, :dry_run, :notification]
     end
 
     attr_accessor :data
@@ -18,6 +18,7 @@ module GCM
 
     def to_h
       hash = {
+        notification: notification,
         data: data,
         collapse_key: collapse_key,
         time_to_live: time_to_live,
@@ -31,6 +32,5 @@ module GCM
     def ==(that)
       attributes == that.attributes
     end
-
   end
 end
