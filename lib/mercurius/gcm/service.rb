@@ -26,6 +26,12 @@ module GCM
       result
     end
 
+    def deliver_topic(notification, topic)
+      GCM::Result.new(notification).tap do |result|
+        result.process_response connection.write(notification.to_h.merge(to: topic)), [topic]
+      end
+    end
+
     private
 
       def too_many_retries?
