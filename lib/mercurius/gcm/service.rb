@@ -3,7 +3,7 @@ module GCM
     include ActiveModel::Model
 
     MAX_NUMBER_OF_RETRIES = 3
-    MAX_DEVICES_AT_ONCE = 999
+    BATCH_SIZE = 999
 
     attr_accessor :host, :key
     attr_reader :connection, :attempts
@@ -17,13 +17,15 @@ module GCM
     end
 
     def deliver(notification, *device_tokens)
-      result = GCM::Result.new(notification)
-      device_tokens = Array(device_tokens).flatten
-      device_tokens.each_slice(MAX_DEVICES_AT_ONCE) do |tokens|
+      # result = GCM::Result.new(notification)
+      response = GCM::Response.new(notification)
+
+      each_batch_of_tokens(device_tokens) do |tokens|
         payload = notification.to_h.merge registration_ids: tokens
-        result.process_response connection.write(payload), tokens
+        response << GCM::Result.new(connection.write(payload), tokens)
       end
-      result
+
+      response
     end
 
     def deliver_topic(notification, topic)
@@ -33,10 +35,14 @@ module GCM
     end
 
     private
+      def each_batch_of_tokens(tokens, batch_size: BATCH_SIZE, &block)
+        Array(tokens).flatten.each_slice(batch_size) do |batch|
+          yield batch
+        end
+      end
 
       def too_many_retries?
         @attempts >= MAX_NUMBER_OF_RETRIES
       end
-
   end
 end
