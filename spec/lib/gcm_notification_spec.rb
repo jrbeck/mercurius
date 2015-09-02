@@ -9,7 +9,7 @@ describe GCM::Notification do
     end
 
     it 'should move other attributes to data' do
-      notification = GCM::Notification.new({ message: 'hello', dry_run: true})
+      notification = GCM::Notification.new(data: { message: 'hello' }, dry_run: true)
       expect(notification.dry_run).to eq true
       expect(notification.data).to eq({ message: 'hello' })
     end

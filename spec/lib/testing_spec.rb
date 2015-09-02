@@ -18,7 +18,7 @@ describe 'Test mode' do
 
   context 'GCM' do
     let(:service) { GCM::MockService.new }
-    let(:message) { GCM::Notification.new(alert: 'Hey') }
+    let(:message) { GCM::Notification.new(data: { alert: 'Hey' }) }
 
     it 'returns the deliveries sent to GCM' do
       result = service.deliver message, 'token123'

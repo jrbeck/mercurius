@@ -1,6 +1,6 @@
 describe GCM::Service do
   let(:service) { GCM::Service.new }
-  let(:message) { GCM::Notification.new(alert: 'Hey') }
+  let(:message) { GCM::Notification.new(data: { alert: 'Hey' }) }
 
   it 'should default to the GCM module configs' do
     expect(service.host).to eq GCM.host
