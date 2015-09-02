@@ -26,16 +26,6 @@ module APNS
       [0, 0, 32, package_device_token(device_token), 0, packaged_message.bytesize, packaged_message].pack("ccca*cca*")
     end
 
-    def package_device_token(device_token)
-      [device_token.gsub(/[\s|<|>]/,'')].pack('H*')
-    end
-
-    def packaged_message
-      { aps: payload }.to_json.gsub(/\\u([\da-fA-F]{4})/) do |m|
-        [$1].pack("H*").unpack("n*").pack("U*")
-      end
-    end
-
     def ==(that)
       attributes == that.attributes
     end
@@ -44,5 +34,15 @@ module APNS
       packaged_message.bytesize <= MAX_PAYLOAD_BYTES
     end
 
+    private
+      def package_device_token(device_token)
+        [device_token.gsub(/[\s|<|>]/,'')].pack('H*')
+      end
+
+      def packaged_message
+        { aps: payload }.to_json.gsub(/\\u([\da-fA-F]{4})/) do |m|
+          [$1].pack("H*").unpack("n*").pack("U*")
+        end
+      end
   end
 end
