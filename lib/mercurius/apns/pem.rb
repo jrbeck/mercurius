@@ -9,7 +9,6 @@ module APNS
     end
 
     private
-
       def read_file_at_path
         if File.exist? path
           File.read path
@@ -17,6 +16,5 @@ module APNS
           raise PemNotFoundError.new
         end
       end
-
   end
 end

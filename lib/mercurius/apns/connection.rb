@@ -34,13 +34,11 @@ module APNS
     end
 
     private
-
       def ssl_context_for_pem(pem)
         context = OpenSSL::SSL::SSLContext.new
         context.cert = OpenSSL::X509::Certificate.new(pem.data)
         context.key = OpenSSL::PKey::RSA.new(pem.data, pem.password)
         context
       end
-
   end
 end
