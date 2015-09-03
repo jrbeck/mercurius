@@ -14,7 +14,7 @@ module GCM
       message_id.present?
     end
 
-    def failure?
+    def fail?
       !success?
     end
 

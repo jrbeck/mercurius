@@ -19,7 +19,7 @@ module GCM
     end
 
     def failed
-      @results.select &:failure?
+      @results.select &:fail?
     end
 
     def with_canonical_ids

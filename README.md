@@ -28,14 +28,14 @@ Create the service with:
 
 Now create the notification that you wish to send:
 
-    gcm_notification = GCM::Notification.new(alert: 'Hey')
+    gcm_notification = GCM::Notification.new(data: { alert: 'Hey' })
 
 You can deliver the gcm_notification in the following manners:
 
-    gcm_service.deliver gcm_notification, 'token123'              # single recipient
-    gcm_service.deliver gcm_notification, 'token123', 'token456'  # multiple recipients
-    token_array = ['token123', 'token456']
-    gcm_service.deliver gcm_notification, token_array             # multiple recipients
+    gcm_service.deliver gcm_notification, 'token123'               # single recipient
+    gcm_service.deliver gcm_notification, 'token123', 'token456'   # multiple recipients
+    gcm_service.deliver gcm_notification, ['token123', 'token456'] # multiple recipients
+    gcm_service.deliver gcm_notification, topic: 'topic123'        # topic delivery
 
 ## APNS
 

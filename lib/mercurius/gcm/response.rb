@@ -15,7 +15,7 @@ module GCM
       response.success?
     end
 
-    def failed?
+    def fail?
       !success?
     end
 
@@ -27,6 +27,23 @@ module GCM
         end
         ResultCollection.new(results)
       end
+    end
+
+    def error
+      case status
+      when 401
+        'Authentication error with GCM. Check the server whitelist and the validity of your project key.'
+      when 400
+        'Invalid JSON was sent to GCM.'
+      when 500..599
+        'GCM Internal server error.'
+      else
+        nil
+      end
+    end
+
+    def retry_after
+      response.headers['Retry-After']
     end
 
     def to_h

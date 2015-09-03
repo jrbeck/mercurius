@@ -12,11 +12,17 @@ module GCM
     end
 
     def <<(response)
-      @responses << response
+      @responses.concat Array(response).flatten
     end
 
     def results
-      GCM::ResultCollection.new @responses.map(&:results).flatten
+      out = GCM::ResultCollection.new
+      @responses.map do |response|
+        response.results.each do |result|
+          out << result
+        end
+      end
+      out
     end
   end
 end

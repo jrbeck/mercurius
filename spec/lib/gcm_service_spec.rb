@@ -34,7 +34,7 @@ describe GCM::Service do
       expect(WebMock).to have_requested(:post, %r[android.googleapis.com/gcm/send]).
         with(body: { data: { alert: 'Hey' }, registration_ids: tokens.take(999) })
       expect(WebMock).to have_requested(:post, %r[android.googleapis.com/gcm/send]).
-        with(body: { data: { alert: 'Hey' }, registration_ids: [tokens.last] })
+        with(body: { data: { alert: 'Hey' }, registration_ids: ['token1000'] })
     end
   end
 
@@ -43,7 +43,7 @@ describe GCM::Service do
     let(:message) { { notification: { title: 'hello', body: 'world' } } }
 
     it 'sends a notification to a topic' do
-      service.deliver_topic message, '/topics/global'
+      service.deliver message, topic: '/topics/global'
       expect(WebMock).to have_requested(:post, %r[android.googleapis.com/gcm/send]).
         with(body: message.merge(to: '/topics/global'))
     end
@@ -56,26 +56,45 @@ describe GCM::Service do
       it 'processes a 200 response' do
         responses = service.deliver message, 'token123'
         expect(responses[0].status).to eq 200
-        expect(responses[0].success).to eq true
+        expect(responses[0].success?).to eq true
         expect(responses.results.failed).to eq []
       end
     end
 
-    context 'failure' do
-      before { stub_request(:post, %r[android.googleapis.com/gcm/send]).to_return(status: 400) }
+    describe 'failure' do
+      context 401 do
+        before { stub_request(:post, %r[android.googleapis.com/gcm/send]).to_return(status: 401) }
 
-      it 'processes a 400 response' do
-        result = service.deliver message, 'token123'
-        expect(result.responses[0].status).to eq 400
-        expect(result.responses[0].message).to eq GCM::Response::MESSAGES[400]
-        expect(result.failed_device_tokens).to eq ['token123']
+        it 'has a meaningful message from #error' do
+          responses = service.deliver message, 'token123'
+          expect(responses[0].error).to match /Authentication error/
+        end
       end
 
-      it 'adds all failed messages to the failed device tokens array' do
-        tokens = (1..1000).to_a.map { |i| "token#{i}" }
-        result = service.deliver message, tokens
-        expect(result.failed_device_tokens).to include 'token1'
-        expect(result.failed_device_tokens).to include 'token1000'
+      context 400 do
+        before { stub_request(:post, %r[android.googleapis.com/gcm/send]).to_return(status: 400) }
+
+        it 'has a meaningful message from #error' do
+          responses = service.deliver message, 'token123'
+          expect(responses[0].error).to match /Invalid JSON/
+        end
+      end
+
+      context 500..599 do
+        before do
+          stub_request(:post, %r[android.googleapis.com/gcm/send]).
+            to_return status: 500, headers: { 'Retry-After' => '120' }
+        end
+
+        it 'has a meaningful message from #error' do
+          responses = service.deliver message, 'token123'
+          expect(responses[0].error).to match /GCM Internal server error/
+        end
+
+        it 'returns the Retry-After header from GCM' do
+          responses = service.deliver message, 'token123'
+          expect(responses[0].retry_after).to eq '120'
+        end
       end
     end
 
