@@ -33,7 +33,6 @@ module APNS
     end
 
     private
-
       def persistent?
         @_persistent
       end
@@ -57,6 +56,5 @@ module APNS
       def too_many_retries?
         @attempts >= MAX_NUMBER_OF_RETRIES
       end
-
   end
 end

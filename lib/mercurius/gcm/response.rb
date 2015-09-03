@@ -1,49 +1,55 @@
 module GCM
   class Response
-    attr_reader :response, :device_tokens
+    attr_reader :response, :tokens
 
-    MESSAGES = {
-      200 => 'Success',
-      400 => 'The request could not be parsed as JSON or it contained invalid fields',
-      401 => 'There was an error authenticating the sender account',
-      500 => 'There was an internal error in the GCM server',
-      503 => 'GCM server is temporarily unavailable',
-      default: 'Unknown error'
-    }
-
-    def initialize(response, device_tokens)
+    def initialize(response, tokens = [])
       @response = response
-      @device_tokens = device_tokens
+      @tokens = tokens
     end
 
     def status
-      @response.status
-    end
-
-    def message
-      MESSAGES.fetch(status, MESSAGES[:default])
+      response.status
     end
 
     def success?
-      @response.success?
+      response.success?
     end
 
-    def failed?
+    def fail?
       !success?
     end
 
-    def has_canonical_ids?
-      (response_body.canonical_ids || 0) > 0
-    end
-
-    def canonical_ids
-      response_body.results.map do |result|
-        result["registration_id"]
+    def results
+      @_results ||= begin
+        results = to_h.fetch 'results', []
+        results.map!.with_index do |attributes, i|
+          GCM::Result.new attributes, tokens[i]
+        end
+        ResultCollection.new(results)
       end
     end
 
-    def response_body
-      @response_body ||= OpenStruct.new JSON.parse(response.body)
+    def error
+      case status
+      when 401
+        'Authentication error with GCM. Check the server whitelist and the validity of your project key.'
+      when 400
+        'Invalid JSON was sent to GCM.'
+      when 500..599
+        'GCM Internal server error.'
+      else
+        nil
+      end
+    end
+
+    def retry_after
+      response.headers['Retry-After']
+    end
+
+    def to_h
+      JSON.parse response.body
+    rescue JSON::ParserError
+      {}
     end
   end
 end

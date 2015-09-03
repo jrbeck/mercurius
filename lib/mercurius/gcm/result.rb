@@ -1,30 +1,29 @@
 module GCM
   class Result
-    attr_reader :responses
+    include ActiveModel::Model
 
-    def initialize(notification)
-      @notification = notification
-      @responses = []
+    attr_accessor :message_id, :registration_id, :error
+    attr_reader :token
+
+    def initialize(attributes, token)
+      super attributes
+      @token = token
     end
 
     def success?
-      failed_responses.empty?
+      message_id.present?
     end
 
-    def process_response(response, device_tokens)
-      self.responses << GCM::Response.new(response, device_tokens)
+    def fail?
+      !success?
     end
 
-    def failed_responses
-      @_failed_responses ||= responses.select(&:failed?)
+    def canonical_id
+      registration_id
     end
 
-    def failed_device_tokens
-      @_failed_device_tokens ||= failed_responses.flat_map { |response| response.device_tokens }
-    end
-
-    def has_canonical_ids?
-      responses.map{ |response| response.has_canonical_ids? }.reduce{ |carry, val| carry || val }
+    def has_canonical_id?
+      canonical_id.present?
     end
   end
 end
