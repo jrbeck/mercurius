@@ -54,10 +54,10 @@ describe GCM::Service do
       before { stub_request :post, %r[android.googleapis.com/gcm/send] }
 
       it 'processes a 200 response' do
-        result = service.deliver message, 'token123'
-        expect(result.responses[0].status).to eq 200
-        expect(result.responses[0].message).to eq GCM::Response::MESSAGES[200]
-        expect(result.failed_device_tokens).to eq []
+        responses = service.deliver message, 'token123'
+        expect(responses[0].status).to eq 200
+        expect(responses[0].success).to eq true
+        expect(responses.results.failed).to eq []
       end
     end
 
