@@ -1,7 +1,8 @@
-require 'mercurius/testing/base'
-require 'mercurius/testing/delivery'
-require 'mercurius/testing/result'
-require 'mercurius/testing/service'
+require 'mercurius/testing/fake_response'
 
-APNS::Service.send :prepend, Mercurius::Testing::Service
-GCM::Service.send :prepend, Mercurius::Testing::Service
+require 'mercurius/testing/gcm/token_serializer'
+require 'mercurius/testing/gcm/successful_connection'
+require 'mercurius/testing/gcm/canonical_id_connection'
+require 'mercurius/testing/gcm/unregistered_device_token_connection'
+
+require 'mercurius/testing/apns/successful_connection'

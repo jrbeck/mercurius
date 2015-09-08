@@ -5,5 +5,4 @@ module GCM
   class << self
     attr_accessor :host, :key
   end
-
 end

@@ -4,14 +4,14 @@ module GCM
 
     BATCH_SIZE = 999
 
-    attr_accessor :host, :key
-    attr_reader :connection, :attempts
+    attr_accessor :host, :key, :connection
+    attr_reader :attempts
 
     def initialize(*)
       super
       @host ||= GCM.host
-      @key  ||= GCM.key
-      @connection = GCM::Connection.new(@host, @key)
+      @key ||= GCM.key
+      @connection ||= GCM::Connection.new(@host, @key)
       @attempts = 0
     end
 
