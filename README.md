@@ -73,8 +73,9 @@ The deliver method can be called in the following ways:
 
 ## Testing
 
-`GCM::Service` and `APNS::Service` can accept which type of connection to use. Mercurius provides several mock connections
-for convenient testing. You can create a custom fake connection if you require a special use case.
+`GCM::Service` and `APNS::Service` can accept which type of connection they use to deliver pushes.
+Mercurius provides several mock connections for convenient testing. You can create a custom fake
+connection if you require a special use case.
 
 ```ruby
 # Tokens passed will return successfully from GCM
