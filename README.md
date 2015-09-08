@@ -82,10 +82,10 @@ connection if you require a special use case.
 GCM::Service.new connection: GCM::SuccessfulConnection.new
 
 # Tokens passed will return a NotRegistered error from the fake GCM
-GCM::Service.new connection: GCM::UnregisteredDeviceTokenConnection.new('token123')`
+GCM::Service.new connection: GCM::UnregisteredDeviceTokenConnection.new('token123')
 
 # Tokens passed as keys will return their mapped value as the canonical ID
-GCM::Service.new connection: GCM::CanonicalIdConnection.new('token123' => 'canonical123')`
+GCM::Service.new connection: GCM::CanonicalIdConnection.new('token123' => 'canonical123')
 ```
 
 ## Contributing
