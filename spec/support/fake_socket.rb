@@ -26,5 +26,4 @@ class FakeSocket < StringIO
   def closed?
     @_open == false
   end
-
 end

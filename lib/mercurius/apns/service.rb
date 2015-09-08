@@ -4,15 +4,15 @@ module APNS
 
     MAX_NUMBER_OF_RETRIES = 3
 
-    attr_accessor :host, :port, :pem
-    attr_reader :connection, :attempts
+    attr_accessor :host, :port, :pem, :connection
+    attr_reader :attempts
 
     def initialize(*)
       super
       @host ||= APNS.host
       @port ||= APNS.port
-      @pem  ||= APNS.pem
-      @connection = APNS::Connection.new(@host, @port, @pem)
+      @pem ||= APNS.pem
+      @connection ||= APNS::Connection.new(@host, @port, @pem)
       @attempts = 0
     end
 
