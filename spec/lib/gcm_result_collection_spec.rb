@@ -7,6 +7,23 @@ describe GCM::ResultCollection do
     ]
   end
 
+  describe 'Enumerable' do
+    it '#[] returns the result at the given index' do
+      expect(subject[0].token).to eq 'token123'
+    end
+
+    it '#each iterates through the results' do
+      subject.each.with_index do |result, i|
+        expect(result).to eq subject[i]
+      end
+    end
+
+    it '#<< adds a new result to the collection' do
+      subject << GCM::Result.new({ message_id: '3' }, 'token789')
+      expect(subject.to_a.last.token).to eq 'token789'
+    end
+  end
+
   describe '#succeeded' do
     it 'returns only the successful results' do
       expect(subject.succeeded.count).to eq 2

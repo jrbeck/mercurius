@@ -6,14 +6,6 @@ module GCM
       @results = results
     end
 
-    def [](index)
-      @results[index]
-    end
-
-    def each(&block)
-      @results.each &block
-    end
-
     def succeeded
       @results.select &:success?
     end
@@ -26,8 +18,16 @@ module GCM
       @results.select &:has_canonical_id?
     end
 
+    def [](index)
+      @results[index]
+    end
+
     def <<(result)
       @results << result
+    end
+
+    def each(&block)
+      @results.each &block
     end
   end
 end

@@ -1,18 +1,18 @@
 module GCM
   class Response
-    attr_reader :response, :tokens
+    attr_reader :http_response, :tokens
 
-    def initialize(response, tokens = [])
-      @response = response
+    def initialize(http_response, tokens = [])
+      @http_response = http_response
       @tokens = tokens
     end
 
     def status
-      response.status
+      http_response.status
     end
 
     def success?
-      response.success?
+      http_response.success?
     end
 
     def fail?
@@ -43,11 +43,11 @@ module GCM
     end
 
     def retry_after
-      response.headers['Retry-After']
+      http_response.headers['Retry-After']
     end
 
     def to_h
-      JSON.parse response.body
+      JSON.parse http_response.body
     rescue JSON::ParserError
       {}
     end
