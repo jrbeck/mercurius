@@ -20,7 +20,7 @@ describe 'Test mode' do
       end
 
       it 'Returns invalid device errors for the tokens provided' do
-        responses = service.deliver message, 'token123', 'token456'
+        responses = service.deliver message, 'token456', 'token123'
         expect(responses.results.failed.size).to eq 1
         expect(responses.results.failed[0].token).to eq 'token456'
         expect(responses.results.failed[0].error).to eq 'NotRegistered'

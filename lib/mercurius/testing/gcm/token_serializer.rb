@@ -1,15 +1,11 @@
 module GCM
   module TokenSerializer
-    def valid_token_json(tokens)
-      tokens.map do |token|
-        { 'message_id' => SecureRandom.hex }
-      end
+    def valid_token_json(token)
+      { 'message_id' => SecureRandom.hex }
     end
 
-    def invalid_token_json(tokens, error)
-      tokens.map do |token|
-        { 'error' => error }
-      end
+    def invalid_token_json(token, error)
+      { 'error' => error }
     end
 
     def canonical_token_json(tokens, canonical_ids_map)
