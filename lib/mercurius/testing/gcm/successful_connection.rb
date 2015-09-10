@@ -10,7 +10,7 @@ module GCM
         'success' => tokens.size,
         'failure' => 0,
         'canonical_ids' => 0,
-        'results' => valid_token_json(tokens)
+        'results' => tokens.map { |token| valid_token_json(token) }
       }.to_json
 
       Mercurius::FakeResponse.new body: json, status: 200
