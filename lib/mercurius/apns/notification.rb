@@ -48,7 +48,7 @@ module APNS
       end
 
       def payload_json
-        payload.json
+        payload.to_json
       end
   end
 end
