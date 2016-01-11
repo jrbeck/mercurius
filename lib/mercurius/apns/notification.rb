@@ -39,7 +39,7 @@ module APNS
     end
 
     private
-      def packaged_device_token(device_token)
+      def package_device_token(device_token)
         [1, 32, device_token.gsub(/[<\s>]/, '')].pack('cnH64')
       end
 
