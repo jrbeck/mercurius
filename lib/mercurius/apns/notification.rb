@@ -18,31 +18,37 @@ module APNS
         'badge' => badge,
         'sound' => sound,
         'other' => other,
-        'content-available' => content_available,
+        'content-available' => content_available
       }.compact
     end
 
     def pack(device_token)
-      [0, 0, 32, package_device_token(device_token), 0, packaged_message.bytesize, packaged_message].pack("ccca*cca*")
+      data = [
+        package_device_token(device_token),
+        packaged_payload
+      ].compact.join
+      [2, data.bytes.count, data].pack 'cNa*'
     end
 
-    def ==(that)
-      attributes == that.attributes
+    def ==(other)
+      attributes == other.attributes
     end
 
     def valid?
-      packaged_message.bytesize <= MAX_PAYLOAD_BYTES
+      payload_json.bytesize <= MAX_PAYLOAD_BYTES
     end
 
     private
-      def package_device_token(device_token)
-        [device_token.gsub(/[\s|<|>]/,'')].pack('H*')
+      def packaged_device_token(device_token)
+        [1, 32, device_token.gsub(/[<\s>]/, '')].pack('cnH64')
       end
 
-      def packaged_message
-        { aps: payload }.to_json.gsub(/\\u([\da-fA-F]{4})/) do |m|
-          [$1].pack("H*").unpack("n*").pack("U*")
-        end
+      def packaged_payload
+        [2, payload_json.bytes.count, payload_json].pack('cna*')
+      end
+
+      def payload_json
+        payload.json
       end
   end
 end
