@@ -7,6 +7,8 @@ module APNS
     attr_accessor :alert, :badge, :sound, :other, :content_available
     attr_reader :attributes
 
+    validate :payload_size_under_limit
+
     def initialize(attributes = {})
       @attributes = attributes
       super
@@ -34,10 +36,6 @@ module APNS
       attributes == other.attributes
     end
 
-    def valid?
-      payload_json.bytesize <= MAX_PAYLOAD_BYTES
-    end
-
     private
       def package_device_token(device_token)
         [1, 32, device_token.gsub(/[<\s>]/, '')].pack('cnH64')
@@ -49,6 +47,10 @@ module APNS
 
       def payload_json
         payload.to_json
+      end
+
+      def payload_size_under_limit
+        payload_json.bytesize <= MAX_PAYLOAD_BYTES
       end
   end
 end

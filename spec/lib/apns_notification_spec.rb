@@ -1,4 +1,20 @@
 describe APNS::Notification do
+  describe 'validations' do
+    it 'is invalid if the payload JSON is too big' do
+      expect(subject).to receive(:payload) { 'X' * (APNS::Notification::MAX_PAYLOAD_BYTES + 1) }
+      expect(subject).to be_valid
+    end
+
+    it 'is valid if the payload JSON is not too big' do
+      expect(subject).to receive(:payload) { 'X' * (APNS::Notification::MAX_PAYLOAD_BYTES - 1) }
+      expect(subject).to be_valid
+    end
+
+    it 'is valid when the payload is just right' do
+      expect(subject).to receive(:payload) { 'X' * (APNS::Notification::MAX_PAYLOAD_BYTES) }
+      expect(subject).to be_valid
+    end
+  end
 
   describe '#==' do
     it 'doesnt care about object equality' do
@@ -16,5 +32,4 @@ describe APNS::Notification do
       end
     end
   end
-
 end
