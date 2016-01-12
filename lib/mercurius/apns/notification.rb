@@ -7,6 +7,8 @@ module APNS
     attr_accessor :alert, :badge, :sound, :other, :content_available
     attr_reader :attributes
 
+    validate :payload_size_under_limit
+
     def initialize(attributes = {})
       @attributes = attributes
       super
@@ -18,31 +20,37 @@ module APNS
         'badge' => badge,
         'sound' => sound,
         'other' => other,
-        'content-available' => content_available,
+        'content-available' => content_available
       }.compact
     end
 
     def pack(device_token)
-      [0, 0, 32, package_device_token(device_token), 0, packaged_message.bytesize, packaged_message].pack("ccca*cca*")
+      data = [
+        package_device_token(device_token),
+        packaged_payload
+      ].compact.join
+      [2, data.bytes.count, data].pack 'cNa*'
     end
 
-    def ==(that)
-      attributes == that.attributes
-    end
-
-    def valid?
-      packaged_message.bytesize <= MAX_PAYLOAD_BYTES
+    def ==(other)
+      attributes == other.attributes
     end
 
     private
       def package_device_token(device_token)
-        [device_token.gsub(/[\s|<|>]/,'')].pack('H*')
+        [1, 32, device_token.gsub(/[<\s>]/, '')].pack('cnH64')
       end
 
-      def packaged_message
-        { aps: payload }.to_json.gsub(/\\u([\da-fA-F]{4})/) do |m|
-          [$1].pack("H*").unpack("n*").pack("U*")
-        end
+      def packaged_payload
+        [2, payload_json.bytes.count, payload_json].pack('cna*')
+      end
+
+      def payload_json
+        payload.to_json
+      end
+
+      def payload_size_under_limit
+        payload_json.bytesize <= MAX_PAYLOAD_BYTES
       end
   end
 end
