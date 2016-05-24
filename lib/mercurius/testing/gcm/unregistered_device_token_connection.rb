@@ -7,7 +7,7 @@ module GCM
     end
 
     def write(json)
-      tokens = json[:registration_ids]
+      tokens = json[:registration_ids] || Array(json[:to])
 
       json = {
         'multicast_id' => '123',
