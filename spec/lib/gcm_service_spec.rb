@@ -1,6 +1,7 @@
 describe GCM::Service do
   let(:service) { GCM::Service.new }
-  let(:message) { GCM::Notification.new(data: { alert: 'Hey' }) }
+  let(:notification) { GCM::Notification.new message }
+  let(:message) { { title: 'Hello', body: 'World' } }
 
   it 'should default to the GCM module configs' do
     expect(service.host).to eq GCM.host
@@ -8,50 +9,46 @@ describe GCM::Service do
   end
 
   describe '#deliver' do
-    before { stub_request :post, %r[android.googleapis.com/gcm/send] }
+    before { stub_request :post, %r{android.googleapis.com/gcm/send} }
 
     it 'sends a single message' do
-      service.deliver message, 'token123'
-      expect(WebMock).to have_requested(:post, %r[android.googleapis.com/gcm/send]).
-        with(body: { data: { alert: 'Hey' }, registration_ids: ['token123'] })
+      service.deliver notification, 'token123'
+      expect(WebMock).to have_requested(:post, %r{android.googleapis.com/gcm/send})
+        .with body: message.merge(to: 'token123')
     end
 
     it 'sends to multiple tokens via splat' do
-      service.deliver message, 'token123', 'token456'
-      expect(WebMock).to have_requested(:post, %r[android.googleapis.com/gcm/send]).
-        with(body: { data: { alert: 'Hey' }, registration_ids: ['token123', 'token456'] })
+      service.deliver notification, 'token123', 'token456'
+      expect(WebMock).to have_requested(:post, %r{android.googleapis.com/gcm/send})
+        .with body: message.merge(registration_ids: %w(token123 token456))
     end
 
     it 'sends to multiple tokens via array' do
-      service.deliver message, ['token123', 'token456']
-      expect(WebMock).to have_requested(:post, %r[android.googleapis.com/gcm/send]).
-        with(body: { data: { alert: 'Hey' }, registration_ids: ['token123', 'token456'] })
+      service.deliver message, %w(token123 token456)
+      expect(WebMock).to have_requested(:post, %r{android.googleapis.com/gcm/send})
+        .with body: message.merge(registration_ids: %w(token123 token456))
     end
 
     it 'only sends 999 tokens at a time' do
       tokens = (1..1000).to_a.map { |i| "token#{i}" }
       service.deliver message, tokens
-      expect(WebMock).to have_requested(:post, %r[android.googleapis.com/gcm/send]).
-        with(body: { data: { alert: 'Hey' }, registration_ids: tokens.take(999) })
-      expect(WebMock).to have_requested(:post, %r[android.googleapis.com/gcm/send]).
-        with(body: { data: { alert: 'Hey' }, registration_ids: ['token1000'] })
-    end
-  end
+      expect(WebMock).to have_requested(:post, %r{android.googleapis.com/gcm/send})
+        .with body: message.merge(registration_ids: tokens.take(999))
 
-  describe '#deliver_topic' do
-    before { stub_request :post, %r[android.googleapis.com/gcm/send] }
-    let(:message) { { notification: { title: 'hello', body: 'world' } } }
+      expect(WebMock).to have_requested(:post, %r{android.googleapis.com/gcm/send})
+        .with body: message.merge(to: 'token1000')
+    end
 
     it 'sends a notification to a topic' do
       service.deliver message, topic: '/topics/global'
-      expect(WebMock).to have_requested(:post, %r[android.googleapis.com/gcm/send]).
-        with(body: message.merge(to: '/topics/global'))
+      expect(WebMock).to have_requested(:post, %r{android.googleapis.com/gcm/send})
+        .with body: message.merge(to: '/topics/global')
     end
   end
 
   describe 'response' do
     context 'success' do
-      before { stub_request :post, %r[android.googleapis.com/gcm/send] }
+      before { stub_request :post, %r{android.googleapis.com/gcm/send} }
 
       it 'processes a 200 response' do
         responses = service.deliver message, 'token123'
@@ -63,7 +60,7 @@ describe GCM::Service do
 
     describe 'failure' do
       context 401 do
-        before { stub_request(:post, %r[android.googleapis.com/gcm/send]).to_return(status: 401) }
+        before { stub_request(:post, %r{android.googleapis.com/gcm/send}).to_return(status: 401) }
 
         it 'has a meaningful message from #error' do
           responses = service.deliver message, 'token123'
@@ -72,7 +69,7 @@ describe GCM::Service do
       end
 
       context 400 do
-        before { stub_request(:post, %r[android.googleapis.com/gcm/send]).to_return(status: 400) }
+        before { stub_request(:post, %r{android.googleapis.com/gcm/send}).to_return(status: 400) }
 
         it 'has a meaningful message from #error' do
           responses = service.deliver message, 'token123'
@@ -82,7 +79,7 @@ describe GCM::Service do
 
       context 500..599 do
         before do
-          stub_request(:post, %r[android.googleapis.com/gcm/send]).
+          stub_request(:post, %r{android.googleapis.com/gcm/send}).
             to_return status: 500, headers: { 'Retry-After' => '120' }
         end
 
