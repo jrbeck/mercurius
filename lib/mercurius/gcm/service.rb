@@ -36,15 +36,15 @@ module GCM
       end
 
       def unicast(notification, recipient)
-        deliver! notification.to_h.merge(to: recipient)
+        deliver! notification.to_h.merge(to: recipient), recipient
       end
 
       def multicast(notification, recipients)
-        deliver! notification.to_h.merge(registration_ids: recipients)
+        deliver! notification.to_h.merge(registration_ids: recipients), recipients
       end
 
-      def deliver!(payload)
-        GCM::Response.new connection.write(payload)
+      def deliver!(payload, recipients = [])
+        GCM::Response.new connection.write(payload), recipients
       end
 
       def batch(recipients, batch_size: BATCH_SIZE)

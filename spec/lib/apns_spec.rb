@@ -12,7 +12,7 @@ describe APNS do
 
   it 'will not change the host if an invalid mode is specified' do
     APNS.host = 'host'
-    expect { APNS.set_mode(:overdrive) }.to raise_error
+    expect { APNS.mode = :overdrive }.to raise_error InvalidApnsModeError
     expect(APNS.host).to eq 'host'
   end
 
